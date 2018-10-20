@@ -36,7 +36,7 @@ def print_author_and_date(element, args):
     '''Format and display a comment's author/date.'''
     text = element.text_content().strip()
     text = text if args.free_format else textwrap.fill(text, args.width)
-    print('\033[4m{}\033[0m'.format(text))
+    print('\033[1m{}\033[0m'.format(text))
 
 
 def print_comment_body(element, args):
@@ -81,12 +81,8 @@ def print_package_comments(args):
         # Only print the section's title if there are multiple sections.
         if len(comments_sections) > 1:
             title = section[0].xpath('h3/span[@class="text"]/text()')[0]
-            title = (title if args.free_format else
-                     textwrap.fill(title, args.width))
-            width = len(title) + 4 if args.free_format else args.width
-            line = '=' * width
-            print('{}\n= {:^{cols}} =\n{}\n'.format(line, title, line,
-                                                    cols=width-4))
+            title = ' {} '.format(title)
+            print('\033[1m{:—^{cols}}\033[0m\n'.format(title, cols=args.width))
         # Print the comments.
         for element in section[1:]:
             if element.tag == 'h4':
@@ -105,7 +101,7 @@ def main():
                        help='Fetch all comments.')
     group.add_argument('-n', '--num-comments', type=int,
                        help=('Number of comments to fetch. Pinned comments are'
-                             ' always fetched.'))
+                             ' always fetched. Default is 10.'))
     group = arg_parser.add_mutually_exclusive_group()
     group.add_argument('-p', '--pinned-only', action='store_true',
                        help='Display the pinned comments only.')

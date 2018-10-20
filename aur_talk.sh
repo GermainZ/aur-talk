@@ -14,7 +14,7 @@ print_help () {
     printf -- "-a, --all             Fetch all comments.\n"
     printf -- "-n NUM_COMMENTS, --num-comments NUM_COMMENTS\n"
     printf -- "                      Number of comments to fetch. Pinned comments are\n"
-    printf -- "                      always fetched.\n"
+    printf -- "                      always fetched. Default is 10.\n"
     printf -- "-p, --pinned-only     Display the pinned comments only.\n"
     printf -- "-l, --latest-only     Display the latest comments only.\n"
     printf -- "-w WIDTH, --width WIDTH\n"
@@ -84,27 +84,43 @@ print_section () {
     i=1
     while [ $i -le 1000 ]; do
         author=$(printf '%s' "$page" | hq "div.comments:nth-child($1) > .comment-header:nth-of-type($i)" text | xargs)
-        [ -z "$author" ] && break || printf "\e[4m%s\e[0m\n" "$author"
+        [ -z "$author" ] && break || printf "\e[1m%s\e[0m\n" "$author"
         printf '%s' "$page" | hq "div.comments:nth-child($1) > div.article-content:nth-of-type($((i+1)))" data | lynx -width=$(($2+8)) -stdin -dump -nolist | sed -e 's/^ *//'
         printf "\n"
         i=$((i+1))
     done
 }
 
+print_line() {
+    i=1
+    while [ $i -le "$1" ]; do
+        printf '—'
+        i=$((i+1))
+    done
+}
+
+print_title() {
+    line_width=$((($1 - ${#2}) / 2 - 2))
+    printf '\e[1m'
+    print_line $line_width
+    printf " %s " "$2"
+    print_line $line_width
+    printf '\e[0m\n\n'
+}
+
 page=$(curl 2>/dev/null "https://aur.archlinux.org/packages/$1/?O=0&PP=$n")
 is_pinned=$(printf '%s' "$page" | hq "div.comments:nth-child(9)" data)
 if [ "$p" = "y" ] || [ "$l" = "n" ]; then
-    if [ -n "$is_pinned" ]; then
-        printf "===================\n= PINNED COMMENTS =\n===================\n\n"
-    else
+    if [ -z "$is_pinned" ]; then
         printf "No pinned comments.\n"
         exit
     fi
+    [ "$p" = "n" ] && print_title $w "PINNED COMMENTS"
     print_section 7 $w
 fi
 if [ "$p" != "y" ] || [ "$l" = "y" ]; then
     if [ -n "$is_pinned" ]; then
-        printf "===================\n= LATEST COMMENTS =\n===================\n\n"
+        [ "$l" = "n" ] && print_title $w "LATEST COMMENTS"
         print_section 9 $w
     else
         print_section 7 $w
