@@ -28,6 +28,8 @@ def fetch_package_comments(package_name, num_comments):
     except HTTPError:
         print('Package "{}" not found.'.format(package_name))
         exit(1)
+    if not url:
+        return []
     return html.xpath(
         '/html/body/div[2]/div[@class="comments package-comments"]')
 
@@ -67,6 +69,9 @@ def print_package_comments(args):
     '''Fetch and display an AUR package's comments.'''
     comments_sections = fetch_package_comments(args.package_name,
                                                args.num_comments)
+    if len(comments_sections) == 0:
+        print('No comments for this package.')
+        return
     has_pinned_comments = comments_sections[0].xpath(
         'div/h3/span[@class="text"]/text()')[0] == 'Pinned Comments'
     if args.latest_only and len(comments_sections) > 1:
