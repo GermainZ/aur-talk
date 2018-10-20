@@ -5,6 +5,7 @@ These scripts fetch and display the comments of an AUR package.
 
 Two versions are provided: Shell and Python.
 The Python version is faster and has better comments formatting.
+It is also available from the AUR: [aur-talk-git](https://aur.archlinux.org/packages/aur-talk-git/).
 
 Usage
 =====
