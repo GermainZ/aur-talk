@@ -10,7 +10,8 @@ formatting. Additionally, the shell version does not support some options like
 
 This program is also available from the AUR:
 [aur-talk-git](https://aur.archlinux.org/packages/aur-talk-git/). It will be
-installed as `aur-talk` and can be used directly with `aurutils` 2.0+ as a
+installed as `aur-talk` and can be used directly with
+[aurutils](https://github.com/AladW/aurutils) 2.0+ as a
 [contrib](https://github.com/AladW/aurutils/tree/master/contrib) script (e.g.
 `aur talk aurutils -p`).
 
