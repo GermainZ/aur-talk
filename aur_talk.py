@@ -35,7 +35,7 @@ def fetch_package_comments(package_name, num_comments):
 def print_author_and_date(element, args):
     '''Format and display a comment's author/date.'''
     text = element.text_content().strip()
-    text = text if args.free_format else textwrap.fill(text, args.width)
+    text = text if args.width <= 0 else textwrap.fill(text, args.width)
     print('\033[1m{}\033[0m'.format(text))
 
 
@@ -49,7 +49,7 @@ def print_comment_body(element, args):
     for line in text.split('\n'):
         # If it's a list item, wrap it and indent it correctly.
         if line.strip().startswith('-'):
-            if args.free_format:
+            if args.width <= 0:
                 lines.append(line.strip())
             else:
                 num_spaces = len(line) - len(line.lstrip(' '))
@@ -60,7 +60,7 @@ def print_comment_body(element, args):
         else:
             lines.append(line)
     text = '\n'.join(lines)
-    print('{}\n'.format(text))
+    print('\033[2m{}\033[0m\n'.format(text))
 
 
 def print_package_comments(args):
@@ -82,7 +82,7 @@ def print_package_comments(args):
         if len(comments_sections) > 1:
             title = section[0].xpath('h3/span[@class="text"]/text()')[0]
             title = ' {} '.format(title)
-            print('\033[1m{:—^{cols}}\033[0m\n'.format(title, cols=args.width))
+            print('\033[1m{:—^{cols}}\033[0m\n'.format(title, cols=80 if args.width <= 0 else args.width))
         # Print the comments.
         for element in section[1:]:
             if element.tag == 'h4':
@@ -107,16 +107,13 @@ def main():
                        help='Display the pinned comments only.')
     group.add_argument('-l', '--latest-only', action='store_true',
                        help='Display the latest comments only.')
-    group = arg_parser.add_mutually_exclusive_group()
-    group.add_argument('-w', '--width', type=int, default=80,
+    arg_parser.add_argument('-w', '--width', type=int, default=0,
                        help='Number of columns for formatting output. Default '
-                            'is 80.')
-    group.add_argument('-f', '--free-format', action='store_true',
-                       help='Print without any width restrictions.')
+                            'is full available width.')
     arg_parser.add_argument('package_name', metavar='PACKAGE-NAME',
                             help=argparse.SUPPRESS)
     args = arg_parser.parse_args()
-    MARKDOWN_CONVERTER.body_width = 0 if args.free_format else args.width
+    MARKDOWN_CONVERTER.body_width = args.width
     print_package_comments(args)
 
 
