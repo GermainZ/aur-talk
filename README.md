@@ -25,8 +25,7 @@ Display AUR comments for PACKAGE-NAME.
 -l, --latest-only     Display the latest comments only.
 -w WIDTH, --width WIDTH
                       Number of columns for formatting comments. Default
-                      is 80.
--f, --free-format     Print without any width restrictions.
+                      is full available width.
 ```
 
 Dependencies
