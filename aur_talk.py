@@ -3,9 +3,10 @@
 
 import argparse
 import textwrap
+import re
+import shutil
 from urllib.request import urlopen
 from urllib.error import HTTPError
-import re
 
 import lxml.html
 from lxml import etree
@@ -15,7 +16,6 @@ URL = 'https://aur.archlinux.org/packages/{}/?O=0&PP={}'
 # Setup HTML to Markdown converter.
 MARKDOWN_CONVERTER = html2text.HTML2Text()
 MARKDOWN_CONVERTER.ignore_links = False
-MARKDOWN_CONVERTER.body_width = 80
 MARKDOWN_CONVERTER.ul_item_mark = '-'
 RE_STRONG = re.compile('\033\\[1m')
 RE_EMPHASIS = re.compile('\033\\[3m')
@@ -71,10 +71,9 @@ def print_comment_body(element, args):
                 lines_ = textwrap.wrap(line.strip(),
                                        max(1, args.width - num_spaces),
                                        break_long_words=False,
-                                       initial_indent='  ')
-                lines.append(lines_[0])
-                for line_ in lines_[1:]:
-                    lines.append('{}{}'.format(' ' * num_spaces, line_))
+                                       initial_indent='  ',
+                                       subsequent_indent='    ')
+                lines.extend(lines_)
             else:
                 lines.append(line)
         text = '\n'.join(lines)
