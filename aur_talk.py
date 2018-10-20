@@ -14,7 +14,6 @@ URL = 'https://aur.archlinux.org/packages/{}/?O=0&PP={}'
 # Setup HTML to Markdown converter.
 MARKDOWN_CONVERTER = html2text.HTML2Text()
 MARKDOWN_CONVERTER.ignore_links = False
-MARKDOWN_CONVERTER.mark_code = True
 MARKDOWN_CONVERTER.body_width = 80
 MARKDOWN_CONVERTER.ul_item_mark = '-'
 
@@ -35,7 +34,8 @@ def fetch_package_comments(package_name, num_comments):
 def print_author_and_date(element, args):
     '''Format and display a comment's author/date.'''
     text = element.text_content().strip()
-    text = text if args.width == 0 else textwrap.fill(text, args.width)
+    text = text if args.width == 0 else textwrap.fill(text, args.width,
+                                                      break_long_words=False)
     print('\033[1m{}\033[0m'.format(text))
 
 
@@ -45,21 +45,22 @@ def print_comment_body(element, args):
     text = MARKDOWN_CONVERTER.handle(text).strip().replace('\n\n\n', '\n')
     # html2text does not wrap list items, so we're gonna have to do it
     # manually.
-    lines = []
-    for line in text.split('\n'):
-        # If it's a list item, wrap it and indent it correctly.
-        if line.strip().startswith('-'):
-            if args.width == 0:
-                lines.append(line.strip())
-            else:
+    if args.width:
+        lines = []
+        for line in text.split('\n'):
+            # If it's a list item, wrap it and indent it correctly.
+            if line.startswith('  - '):
                 num_spaces = len(line) - len(line.lstrip(' '))
-                lines_ = textwrap.wrap(line.strip(), args.width - num_spaces)
+                lines_ = textwrap.wrap(line.strip(),
+                                       max(1, args.width - num_spaces),
+                                       break_long_words=False,
+                                       initial_indent='  ')
                 lines.append(lines_[0])
                 for line_ in lines_[1:]:
                     lines.append('{}{}'.format(' ' * num_spaces, line_))
-        else:
-            lines.append(line)
-    text = '\n'.join(lines)
+            else:
+                lines.append(line)
+        text = '\n'.join(lines)
     print('\033[2m{}\033[0m\n'.format(text))
 
 
