@@ -1,5 +1,5 @@
 #!/bin/sh -
-set -o errexit -o pipefail -o noclobber -o nounset
+set -o errexit -o noclobber -o nounset
 
 OPTIONS=an:plw:fh
 LONGOPTS=all,num-comments:,pinned-only,latest-only,width,free-format,help
@@ -84,7 +84,7 @@ print_section () {
     i=1
     while [ $i -le 1000 ]; do
         author=$(printf '%s' "$page" | hq "div.comments:nth-child($1) > .comment-header:nth-of-type($i)" text | xargs)
-        [ -z "$author" ] && break || printf "\e[1m%s\e[0m\n" "$author"
+        [ -z "$author" ] && break || printf "\033[1m%s\033[0m\n" "$author"
         printf '%s' "$page" | hq "div.comments:nth-child($1) > div.article-content:nth-of-type($((i+1)))" data | lynx -width=$(($2+8)) -stdin -dump -nolist | sed -e 's/^ *//'
         printf "\n"
         i=$((i+1))
@@ -101,11 +101,11 @@ print_line() {
 
 print_title() {
     line_width=$((($1 - ${#2}) / 2 - 2))
-    printf '\e[1m'
+    printf '\033[1m'
     print_line $line_width
     printf " %s " "$2"
     print_line $line_width
-    printf '\e[0m\n\n'
+    printf '\033[0m\n\n'
 }
 
 page=$(curl 2>/dev/null "https://aur.archlinux.org/packages/$1/?O=0&PP=$n")
