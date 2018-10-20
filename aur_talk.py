@@ -85,6 +85,9 @@ def print_package_comments(args):
     '''Fetch and display an AUR package's comments.'''
     comments_sections = fetch_package_comments(args.package_name,
                                                args.num_comments)
+    if not comments_sections:
+        print('No comments.')
+        return
     has_pinned_comments = comments_sections[0].xpath(
         'div/h3/span[@class="text"]/text()')[0] == 'Pinned Comments'
     if args.latest_only and len(comments_sections) > 1:

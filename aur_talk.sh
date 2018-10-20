@@ -101,6 +101,11 @@ print_title() {
 }
 
 page=$(curl 2>/dev/null "https://aur.archlinux.org/packages/$1/?O=0&PP=$n")
+has_comments=$(printf '%s' "$page" | hq "div.comments:nth-child(7)" data)
+if [ "$p" = "n" ] && [ -z "$has_comments" ]; then
+    printf 'No comments.\n'
+    exit
+fi
 is_pinned=$(printf '%s' "$page" | hq "div.comments:nth-child(9)" data)
 if [ "$p" = "y" ] || [ "$l" = "n" ]; then
     if [ -z "$is_pinned" ]; then
