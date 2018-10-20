@@ -5,6 +5,7 @@ import argparse
 import textwrap
 from urllib.request import urlopen
 from urllib.error import HTTPError
+import re
 
 import lxml.html
 from lxml import etree
@@ -16,6 +17,8 @@ MARKDOWN_CONVERTER = html2text.HTML2Text()
 MARKDOWN_CONVERTER.ignore_links = False
 MARKDOWN_CONVERTER.body_width = 80
 MARKDOWN_CONVERTER.ul_item_mark = '-'
+RE_STRONG = re.compile('\033\\[1m')
+RE_EMPHASIS = re.compile('\033\\[3m')
 
 
 def fetch_package_comments(package_name, num_comments):
@@ -39,10 +42,24 @@ def print_author_and_date(element, args):
     print('\033[1m{}\033[0m'.format(text))
 
 
+def correct_ansi_escapes(text, regex, repl):
+    '''Replace every 2nd ANSI escape code (regex) with a reset code (repl).'''
+    offset = 0
+    for match in list(re.finditer(regex, text))[1::2]:
+        pos = match.span()[1] - 2 + offset
+        text = text[:pos] + repl + text[pos + 1:]
+        offset += 1
+    return text
+
+
 def print_comment_body(element, args):
     '''Format and display a comment's body.'''
     text = etree.tostring(element).decode('utf-8')
     text = MARKDOWN_CONVERTER.handle(text).strip().replace('\n\n\n', '\n')
+    if args.bold:
+        text = correct_ansi_escapes(text, RE_STRONG, '21')
+    if args.italic:
+        text = correct_ansi_escapes(text, RE_EMPHASIS, '23')
     # html2text does not wrap list items, so we're gonna have to do it
     # manually.
     if args.width:
@@ -112,10 +129,23 @@ def main():
     arg_parser.add_argument('-w', '--width', type=int, default=0,
                             help=('Number of columns for formatting output. '
                                   'Default is full available width.'))
+    arg_parser.add_argument('-b', '--bold', action='store_true',
+                            help=('Render **bold** text. May not work '
+                                  'depending on your terminal.'))
+    arg_parser.add_argument('-i', '--italic', action='store_true',
+                            help=('Render _italic_ text. May not work '
+                                  'depending on your terminal.'))
     arg_parser.add_argument('package_name', metavar='PACKAGE-NAME',
                             help=argparse.SUPPRESS)
     args = arg_parser.parse_args()
     MARKDOWN_CONVERTER.body_width = args.width
+    # We're replacing both the starting and ending mark with an ANSI "start"
+    # escape code. We'll replace every 2nd one with an "end" escape code in
+    # `print_comment_body()`.
+    if args.bold:
+        MARKDOWN_CONVERTER.strong_mark = '\033[1m'
+    if args.italic:
+        MARKDOWN_CONVERTER.emphasis_mark = '\033[3m'
     print_package_comments(args)
 
 
