@@ -100,6 +100,7 @@ print_title() {
     printf '\033[0m\n\n'
 }
 
+[ "$p" = "y" ] && n=1
 page=$(curl 2>/dev/null "https://aur.archlinux.org/packages/$1/?O=0&PP=$n")
 has_comments=$(printf '%s' "$page" | hq "div.comments:nth-child(7)" data)
 if [ "$p" = "n" ] && [ -z "$has_comments" ]; then

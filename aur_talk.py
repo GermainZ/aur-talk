@@ -149,6 +149,10 @@ def main():
         MARKDOWN_CONVERTER.strong_mark = '\033[1m'
     if args.italic:
         MARKDOWN_CONVERTER.emphasis_mark = '\033[3m'
+    # We only want pinned comments, so only fetch the bare minimum of normal
+    # comments. Pinned comments are always returned by the server.
+    if args.pinned_only:
+        args.num_comments = 1
     print_package_comments(args)
 
 
