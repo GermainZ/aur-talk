@@ -3,9 +3,16 @@ Description
 
 These scripts fetch and display the comments of an AUR package.
 
-Two versions are provided: Shell and Python.
-The Python version is faster and has better comments formatting.
-It is also available from the AUR: [aur-talk-git](https://aur.archlinux.org/packages/aur-talk-git/).
+Two versions are provided: Python and Shell.
+The Python version is the recommended one. It is faster and has better comments
+formatting. Additionally, the shell version does not support some options like
+`-b` and `-i`.
+
+This program is also available from the AUR:
+[aur-talk-git](https://aur.archlinux.org/packages/aur-talk-git/). It will be
+installed as `aur-talk` and can be used directly with `aurutils` 2.0+ as a
+[contrib](https://github.com/AladW/aurutils/tree/master/contrib) script (e.g.
+`aur talk aurutils -p`).
 
 Usage
 =====
@@ -27,6 +34,10 @@ Display AUR comments for PACKAGE-NAME.
 -w WIDTH, --width WIDTH
                       Number of columns for formatting comments. Default
                       is full available width.
+-b, --bold            Render **bold** text. May not work depending on your
+                      terminal.
+-i, --italic          Render _italic_ text. May not work depending on your
+                      terminal.
 ```
 
 Dependencies
