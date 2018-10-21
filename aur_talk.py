@@ -48,7 +48,7 @@ def correct_ansi_escapes(text, regex, repl):
     for match in list(re.finditer(regex, text))[1::2]:
         pos = match.span()[1] - 2 + offset
         text = text[:pos] + repl + text[pos + 1:]
-        offset += 1
+        offset += len(repl) - 1
     return text
 
 
@@ -57,7 +57,7 @@ def print_comment_body(element, args):
     text = etree.tostring(element).decode('utf-8')
     text = MARKDOWN_CONVERTER.handle(text).strip().replace('\n\n\n', '\n')
     if args.bold:
-        text = correct_ansi_escapes(text, RE_STRONG, '21')
+        text = correct_ansi_escapes(text, RE_STRONG, '22m\033[2')
     if args.italic:
         text = correct_ansi_escapes(text, RE_EMPHASIS, '23')
     # html2text does not wrap list items, so we're gonna have to do it
