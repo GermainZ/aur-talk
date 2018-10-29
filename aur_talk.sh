@@ -74,9 +74,9 @@ fi
 print_section () {
     i=1
     while [ $i -le 1000 ]; do
-        author=$(printf '%s' "$page" | hq "div.comments:nth-child($1) > .comment-header:nth-of-type($i)" text | xargs)
+        author=$(printf '%s' "$page" | hq "div.comments:nth-child($1) > .comment-header:nth-of-type($i)" text)
         [ -z "$author" ] && break || printf '\033[1m%s\033[0m\n' "$author"
-        comment=$(printf '%s' "$page" | hq "div.comments:nth-child($1) > div.article-content:nth-of-type($((i+1)))" data | lynx -width=$(($2+8)) -stdin -dump -nolist | sed -e 's/^ *//')
+        comment=$(printf '%s' "$page" | hq "div.comments:nth-child($1) > div.article-content:nth-of-type($((i+1)))" text md)
         printf '\033[2m%s\033[0m\n\n' "$comment"
         i=$((i+1))
     done

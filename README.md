@@ -57,9 +57,8 @@ Arch users can install them from the main repo: `python`, `python-lxml` and
 
 - [curl](https://curl.haxx.se/)
 - [hq](https://github.com/coderobe/hq)
-- [lynx](https://lynx.browser.org/)
 
-Arch users can install them from the main repo: `curl`, `hq` and `lynx`.
+Arch users can install them from the main repo: `curl` and `hq`).
 
 Example output
 ==============
